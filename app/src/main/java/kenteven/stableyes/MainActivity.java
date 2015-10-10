@@ -22,6 +22,7 @@ import android.widget.ImageView;
 public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnTouchListener
 {
 
+    private ViewPropertyAnimator animation;
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         isAnimating=false;
+        animation = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -154,9 +156,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageView view = (ImageView)findViewById(R.id.imageView);
         Stabilize.updateVariables();
         //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
-        ViewPropertyAnimator animation = view.animate();
+       // ViewPropertyAnimator animation = view.animate();
+        //animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
+        //animation.setDuration(0);
+        if(animation != null)
+            animation.cancel();
+
+        animation = view.animate();
         animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
         animation.setDuration(0);
+        animation.start();
+        animation.withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                animation = null;
+            }
+        });
         Stabilize.dX=0;
         Stabilize.dY=0;
 
