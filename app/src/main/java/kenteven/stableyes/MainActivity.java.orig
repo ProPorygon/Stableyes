@@ -10,8 +10,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+<<<<<<< HEAD
 import android.util.Log;
 import android.view.View;
+=======
+>>>>>>> origin/master
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,13 +43,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+<<<<<<< HEAD
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_NORMAL);
-
+=======
         ImageView img = (ImageView) findViewById(R.id.imageView);
         img.setImageResource(R.drawable.random);
 
+>>>>>>> origin/master
     }
 
     @Override
