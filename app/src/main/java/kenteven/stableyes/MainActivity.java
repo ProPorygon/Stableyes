@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -37,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     ImageView img;
     WebView wv;
 
+    enum Type {
+        IMAGE, WEB
+    }
+    Type type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         isAnimating=false;
@@ -67,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         img = (ImageView) findViewById(R.id.imageView);
         img.setImageResource(R.drawable.random);
-        img.setVisibility(View.INVISIBLE);
+        img.setVisibility(View.VISIBLE);
+        type = Type.IMAGE;
         wv = (WebView) findViewById(R.id.webview);
         wv.setVisibility(View.INVISIBLE);
         wv.loadUrl("https://google.com");
@@ -150,10 +157,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (id == R.id.action_web) {
             img.setVisibility(View.INVISIBLE);
             wv.setVisibility(View.VISIBLE);
+            type = Type.WEB;
         }
         if (id == R.id.action_img) {
             img.setVisibility(View.VISIBLE);
             wv.setVisibility(View.INVISIBLE);
+            type = Type.IMAGE;
         }
 
         return super.onOptionsItemSelected(item);
@@ -195,7 +204,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void stabilize(){
-        ImageView view = (ImageView)findViewById(R.id.imageView);
+        View view = null;
+        switch (type) {
+            case IMAGE:
+                view = img;
+                break;
+            case WEB:
+                view = wv;
+        }
         Stabilize.updateVariables();
         //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
        // ViewPropertyAnimator animation = view.animate();
