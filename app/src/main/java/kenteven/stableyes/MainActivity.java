@@ -52,17 +52,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         move = 0;
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Use this to toggle movement", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                move = 1-move;
-                maxdx=0;
-                maxdy=0;
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Use this to toggle movement", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                move = 1-move;
+//                maxdx=0;
+//                maxdy=0;
+//            }
+//        });
 
         maxdx=0;
         maxdy=0;
@@ -151,9 +151,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if (id == R.id.action_web) {
             img.setVisibility(View.GONE);
             wv.setVisibility(View.VISIBLE);
