@@ -41,8 +41,8 @@ public class Stabilize {
             Stabilize.dX += Stabilize.response[i]*Stabilize.accx.get(i)*-1;
             Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i)*-1;
         }
-        Stabilize.dX *= 50;
-        Stabilize.dY *= 50;
+        Stabilize.dX *= 20;
+        Stabilize.dY *= 20;
     }
 
     public static double checkIfShaking() {

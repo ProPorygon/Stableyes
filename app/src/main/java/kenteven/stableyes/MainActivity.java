@@ -10,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -132,19 +131,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if(z<0.1&&z>-0.1)
                 z=0;
 
-            //if(Math.abs(x)>maxdx)
-            //    maxdx=Math.abs(x);
-            //if(Math.abs(y)>maxdy)
-            //    maxdy=Math.abs(y);
-
 
             //add each x and y value to the circular queue.
             Stabilize.addToAccArrays(x, y);
 
-            //double shake = Stabilize.checkIfShaking();
+            double shake = Stabilize.checkIfShaking();
 
-            //if(shake>3)
-            stabilize();
+            if(shake>3)
+                stabilize();
             //Log.d("MAX VALUE", "Max X: " + maxdx + " Max Y: " + maxdy);
 
             //Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
@@ -161,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //animation.setDuration(0);
         if(animation != null)
             animation.cancel();
-
         animation = view.animate();
         animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
         animation.setDuration(0);
@@ -176,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Stabilize.dY=0;
 
     }
+
 
 
     @Override
