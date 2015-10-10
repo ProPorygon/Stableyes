@@ -11,10 +11,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 
@@ -27,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float newdx, newdy, prevdx, prevdy;
     float maxdx, maxdy;
     int move;
+
+    ImageView img;
+    WebView wv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,14 +60,42 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
 
-        ImageView img = (ImageView) findViewById(R.id.imageView);
+        img = (ImageView) findViewById(R.id.imageView);
         img.setImageResource(R.drawable.random);
+        img.setVisibility(View.INVISIBLE);
+        wv = (WebView) findViewById(R.id.webview);
+        wv.setVisibility(View.INVISIBLE);
+        wv.loadUrl("https://google.com");
+        wv.setWebViewClient(new MyBrowser());
         float initx = img.getX();
         float inity = img.getY();
         //img.setOnTouchListener(this);
         Stabilize.init();
     }
 
+    private class MyBrowser extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown (int keyCode, KeyEvent event) {
+        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_BACK:
+                    if(wv.canGoBack()) {
+                        wv.goBack();
+                    } else {
+                        finish();
+                    }
+                    return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
@@ -107,6 +141,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        if (id == R.id.action_web) {
+            img.setVisibility(View.INVISIBLE);
+            wv.setVisibility(View.VISIBLE);
+        }
+        if (id == R.id.action_img) {
+            img.setVisibility(View.VISIBLE);
+            wv.setVisibility(View.INVISIBLE);
         }
 
         return super.onOptionsItemSelected(item);
