@@ -18,19 +18,15 @@ import android.view.View;
 import android.widget.ImageView;
 
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnTouchListener
+{
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-    double dX, dY;
     float newdx, newdy, prevdx, prevdy;
     float maxdx, maxdy;
     int move;
-    double[] accx, accy;
-    int arrPtr;
-    double[] response;
-    float initx, inity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,18 +47,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        accx = new double[100];
-        accy = new double[100];
-        arrPtr=0;
-        response = new double[100];
-
-        double k = 1;
-        for(int i=0; i<100; i++){
-            accx[i]=0;
-            accy[i]=0;
-            response[99-i] = i*Math.pow(Math.E, -i*Math.sqrt(k));
-        }
-
         maxdx=0;
         maxdy=0;
 
@@ -75,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float initx = img.getX();
         float inity = img.getY();
         //img.setOnTouchListener(this);
+        Stabilize.init();
     }
 
 
@@ -85,15 +70,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             case MotionEvent.ACTION_DOWN:
 
-                dX = view.getX() - event.getRawX();
-                dY = view.getY() - event.getRawY();
+                Stabilize.dX = view.getX() - event.getRawX();
+                Stabilize.dY = view.getY() - event.getRawY();
                 break;
 
             case MotionEvent.ACTION_MOVE:
 
                 view.animate()
-                        .x(event.getRawX() + (float)dX)
-                        .y(event.getRawY() + (float) dY)
+                        .x(event.getRawX() + (float)Stabilize.dX)
+                        .y(event.getRawY() + (float) Stabilize.dY)
                         .setDuration(0)
                         .start();
                 break;
@@ -103,27 +88,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-    public void stabilize(){
-        ImageView view = (ImageView)findViewById(R.id.imageView);
-
-        //if(move==1)
-        //    view.animate().x(dx).y(dy).setDuration(0).start();
-
-        //Y(t) = H(t) * -A(t)
-        //H(t) = response(t)
-
-        for(int i=0; i< 100; i++){
-            dX += response[i]*accx[i];
-            dY += response[i]*accy[i]*-1;
-        }
-        dX *= 10;
-        dY *= 10;
-        Log.e("Change", "Dx: "+dX+" Dy: "+dY);
-        view.animate().x(initx+(float)dX).y(inity+(float)dY).setDuration(0).start();
-        dX=0;
-        dY=0;
-
-    }
 
 
     @Override
@@ -170,51 +134,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
             //add each x and y value to the circular queue.
-            addToAccArrays(x,y);
+            Stabilize.addToAccArrays(x, y);
 
-            double shake = checkIfShaking();
+            double shake = Stabilize.checkIfShaking();
 
             //if(shake>3)
                 stabilize();
             //Log.d("MAX VALUE", "Max X: " + maxdx + " Max Y: " + maxdy);
 
             Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
-            stabilize();
         }
 
     }
 
-    private double checkIfShaking() {
+    public void stabilize(){
+        ImageView view = (ImageView)findViewById(R.id.imageView);
+        Stabilize.updateVariables();
+        //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
+        view.animate().x(Stabilize.initx+(float)Stabilize.dX).y(Stabilize.inity+(float)Stabilize.dY).setDuration(0).start();
+        Stabilize.dX=0;
+        Stabilize.dY=0;
 
-        //take the absolute value of the last 35(variable) values of acceleration, average them,
-        // then add the x & y components to check against a threshold
-        double sum=0;
-        for(int i=65; i<100 ; i++){
-            sum += Math.abs(accx[i])+Math.abs(accy[i]);
-        }
-        sum = sum/35;//avg the values by dividing the sum by 35
-        return sum;
     }
 
-    private void addToAccArrays(float x, float y) {
-        if(arrPtr<99){
-            accx[arrPtr]=x;
-            accy[arrPtr]=y;
-            arrPtr++;
-        }
-        else{
-            for(int i = 0; i<99; i++){
-                accx[i] = accx[i+1];
-                accy[i] = accy[i+1];
-            }
-            accx[99]=x;
-            accy[99]=y;
-        }
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 
     @Override
