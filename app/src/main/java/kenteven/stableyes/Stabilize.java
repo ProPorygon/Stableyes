@@ -38,11 +38,11 @@ public class Stabilize {
         //H(t) = response(t)
 
         for(int i=0; i< 100; i++){
-            Stabilize.dX += Stabilize.response[i]*Stabilize.accx.get(i);
+            Stabilize.dX += Stabilize.response[i]*Stabilize.accx.get(i)*-1;
             Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i)*-1;
         }
-        Stabilize.dX *= 10;
-        Stabilize.dY *= 10;
+        Stabilize.dX *= 50;
+        Stabilize.dY *= 50;
     }
 
     public static double checkIfShaking() {
@@ -58,11 +58,8 @@ public class Stabilize {
     }
 
     public static void addToAccArrays(float x, float y) {
-        if(accx.size() > 99) //accx and accy have the same size at all times
-        {
-            accx.remove(0);
-            accy.remove(0);
-        }
+        accx.remove(0);
+        accy.remove(0);
 
         accx.add(new Double(x));
         accy.add(new Double(y));

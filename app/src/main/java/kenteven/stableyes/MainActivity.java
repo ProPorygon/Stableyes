@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 
 
@@ -27,9 +28,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float newdx, newdy, prevdx, prevdy;
     float maxdx, maxdy;
     int move;
+    boolean isAnimating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        isAnimating=false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -136,13 +139,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //add each x and y value to the circular queue.
             Stabilize.addToAccArrays(x, y);
 
-            double shake = Stabilize.checkIfShaking();
+            //double shake = Stabilize.checkIfShaking();
 
             //if(shake>3)
-                stabilize();
+            stabilize();
             //Log.d("MAX VALUE", "Max X: " + maxdx + " Max Y: " + maxdy);
 
-            Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
+            //Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
         }
 
     }
@@ -151,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageView view = (ImageView)findViewById(R.id.imageView);
         Stabilize.updateVariables();
         //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
-        view.animate().x(Stabilize.initx+(float)Stabilize.dX).y(Stabilize.inity+(float)Stabilize.dY).setDuration(0).start();
+        ViewPropertyAnimator animation = view.animate();
+        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
+        animation.setDuration(0);
         Stabilize.dX=0;
         Stabilize.dY=0;
 
