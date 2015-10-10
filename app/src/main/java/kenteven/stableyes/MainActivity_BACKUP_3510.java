@@ -16,9 +16,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+<<<<<<< HEAD
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+=======
 import android.view.ViewPropertyAnimator;
+>>>>>>> origin/master
 import android.widget.ImageView;
 
 

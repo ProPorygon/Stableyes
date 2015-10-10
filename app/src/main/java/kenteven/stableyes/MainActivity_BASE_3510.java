@@ -11,36 +11,25 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnTouchListener
 {
 
-    private ViewPropertyAnimator animation;
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
     float newdx, newdy, prevdx, prevdy;
     float maxdx, maxdy;
     int move;
-    boolean isAnimating;
-
-    ImageView img;
-    WebView wv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        isAnimating=false;
-        animation = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -65,42 +54,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
 
-        img = (ImageView) findViewById(R.id.imageView);
+        ImageView img = (ImageView) findViewById(R.id.imageView);
         img.setImageResource(R.drawable.random);
-        img.setVisibility(View.INVISIBLE);
-        wv = (WebView) findViewById(R.id.webview);
-        wv.setVisibility(View.INVISIBLE);
-        wv.loadUrl("https://google.com");
-        wv.setWebViewClient(new MyBrowser());
         float initx = img.getX();
         float inity = img.getY();
         //img.setOnTouchListener(this);
         Stabilize.init();
     }
 
-    private class MyBrowser extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return true;
-        }
-    }
-
-    @Override
-    public boolean onKeyDown (int keyCode, KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_BACK:
-                    if(wv.canGoBack()) {
-                        wv.goBack();
-                    } else {
-                        finish();
-                    }
-                    return true;
-            }
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
@@ -147,14 +108,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (id == R.id.action_settings) {
             return true;
         }
-        if (id == R.id.action_web) {
-            img.setVisibility(View.INVISIBLE);
-            wv.setVisibility(View.VISIBLE);
-        }
-        if (id == R.id.action_img) {
-            img.setVisibility(View.VISIBLE);
-            wv.setVisibility(View.INVISIBLE);
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -183,13 +136,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //add each x and y value to the circular queue.
             Stabilize.addToAccArrays(x, y);
 
-            //double shake = Stabilize.checkIfShaking();
+            double shake = Stabilize.checkIfShaking();
 
             //if(shake>3)
-            stabilize();
+                stabilize();
             //Log.d("MAX VALUE", "Max X: " + maxdx + " Max Y: " + maxdy);
 
-            //Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
+            Log.d("VALUE", "X: " + x + " Y: " + y + " Z: " + z + " Shake: " + shake);
         }
 
     }
@@ -198,22 +151,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageView view = (ImageView)findViewById(R.id.imageView);
         Stabilize.updateVariables();
         //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
-       // ViewPropertyAnimator animation = view.animate();
-        //animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
-        //animation.setDuration(0);
-        if(animation != null)
-            animation.cancel();
-
-        animation = view.animate();
-        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
-        animation.setDuration(0);
-        animation.start();
-        animation.withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                animation = null;
-            }
-        });
+        view.animate().x(Stabilize.initx+(float)Stabilize.dX).y(Stabilize.inity+(float)Stabilize.dY).setDuration(0).start();
         Stabilize.dX=0;
         Stabilize.dY=0;
 
