@@ -39,7 +39,7 @@ public class Stabilize {
 
         for(int i=0; i< 100; i++){
             Stabilize.dX += Stabilize.response[i]*Stabilize.accx.get(i)*-1;
-            Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i)*-1;
+            Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i);
         }
         Stabilize.dX *= 50;
         Stabilize.dY *= 50;

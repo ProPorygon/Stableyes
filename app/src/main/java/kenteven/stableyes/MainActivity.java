@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         img.setVisibility(View.VISIBLE);
         type = Type.IMAGE;
         wv = (WebView) findViewById(R.id.webview);
-        wv.setVisibility(View.INVISIBLE);
+        wv.setVisibility(View.GONE);
         wv.loadUrl("https://google.com");
         wv.setWebViewClient(new MyBrowser());
         float initx = img.getX();
@@ -155,13 +155,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return true;
         }
         if (id == R.id.action_web) {
-            img.setVisibility(View.INVISIBLE);
+            img.setVisibility(View.GONE);
             wv.setVisibility(View.VISIBLE);
             type = Type.WEB;
         }
         if (id == R.id.action_img) {
             img.setVisibility(View.VISIBLE);
-            wv.setVisibility(View.INVISIBLE);
+            wv.setVisibility(View.GONE);
             type = Type.IMAGE;
         }
 
@@ -217,19 +217,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
        // ViewPropertyAnimator animation = view.animate();
         //animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
         //animation.setDuration(0);
-        if(animation != null)
-            animation.cancel();
-
-        animation = view.animate();
-        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
-        animation.setDuration(0);
-        animation.start();
-        animation.withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                animation = null;
-            }
-        });
+//        if(animation != null)
+//            animation.cancel();
+//
+//        animation = view.animate();
+//        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
+//        animation.setDuration(0);
+//        animation.start();
+//        animation.withEndAction(new Runnable() {
+//            @Override
+//            public void run() {
+//                animation = null;
+//            }
+//        });
+        view.setX(Stabilize.initx + (float) Stabilize.dX);
+        view.setY(Stabilize.inity + (float) Stabilize.dY);
         Stabilize.dX=0;
         Stabilize.dY=0;
 
