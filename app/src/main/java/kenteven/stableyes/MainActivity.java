@@ -5,15 +5,20 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 
@@ -29,27 +34,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float maxdx, maxdy;
     int move;
     boolean isAnimating;
+    long  count;
+
+    ImageView img;
+    WebView wv;
+
+    enum Type {
+        IMAGE, WEB
+    }
+    Type type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         isAnimating=false;
         animation = null;
+        count=0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         move = 0;
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Use this to toggle movement", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                move = 1-move;
-                maxdx=0;
-                maxdy=0;
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Use this to toggle movement", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                move = 1-move;
+//                maxdx=0;
+//                maxdy=0;
+//            }
+//        });
 
         maxdx=0;
         maxdy=0;
@@ -58,14 +73,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
 
-        ImageView img = (ImageView) findViewById(R.id.imageView);
+        img = (ImageView) findViewById(R.id.imageView);
         img.setImageResource(R.drawable.random);
+        img.setVisibility(View.VISIBLE);
+        type = Type.IMAGE;
+        wv = (WebView) findViewById(R.id.webview);
+        wv.setVisibility(View.GONE);
+        wv.loadUrl("https://google.com");
+        wv.setWebViewClient(new MyBrowser());
         float initx = img.getX();
         float inity = img.getY();
         //img.setOnTouchListener(this);
         Stabilize.init();
     }
 
+    private class MyBrowser extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown (int keyCode, KeyEvent event) {
+        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_BACK:
+                    if(wv.canGoBack()) {
+                        wv.goBack();
+                    } else {
+                        finish();
+                    }
+                    return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
@@ -109,8 +153,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_web) {
+            img.setVisibility(View.GONE);
+            wv.setVisibility(View.VISIBLE);
+            type = Type.WEB;
+        }
+        if (id == R.id.action_img) {
+            img.setVisibility(View.VISIBLE);
+            wv.setVisibility(View.GONE);
+            type = Type.IMAGE;
         }
 
         return super.onOptionsItemSelected(item);
@@ -147,24 +198,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void stabilize(){
-        ImageView view = (ImageView)findViewById(R.id.imageView);
+
+        View view = img;
+        switch (type) {
+            case IMAGE:
+                view = img;
+                break;
+            case WEB:
+                view = wv;
+        }
         Stabilize.updateVariables();
-        //Log.e("Change", "Dx: "+dX+" Dy: "+dY);
-       // ViewPropertyAnimator animation = view.animate();
-        //animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
-        //animation.setDuration(0);
-        if(animation != null)
-            animation.cancel();
-        animation = view.animate();
-        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
-        animation.setDuration(0);
-        animation.start();
-        animation.withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                animation = null;
-            }
-        });
+
+//        if(animation != null)
+//            animation.cancel();
+//
+//        animation = view.animate();
+//        animation.x(Stabilize.initx + (float) Stabilize.dX).y(Stabilize.inity + (float) Stabilize.dY);
+//        animation.setDuration(0);
+//        animation.start();
+//        animation.withEndAction(new Runnable() {
+//            @Override
+//            public void run() {
+//                animation = null;
+//            }
+//        });
+
+        view.setX(Stabilize.initx + (float) Stabilize.dX);
+        view.setY(Stabilize.inity + (float) Stabilize.dY);
+
         Stabilize.dX=0;
         Stabilize.dY=0;
 

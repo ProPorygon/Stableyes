@@ -31,15 +31,10 @@ public class Stabilize {
 
     public static void updateVariables()
     {
-        //if(move==1)
-        //    view.animate().x(dx).y(dy).setDuration(0).start();
-
-        //Y(t) = H(t) * -A(t)
-        //H(t) = response(t)
 
         for(int i=0; i< 100; i++){
             Stabilize.dX += Stabilize.response[i]*Stabilize.accx.get(i)*-1;
-            Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i)*-1;
+            Stabilize.dY += Stabilize.response[i]*Stabilize.accy.get(i);
         }
         Stabilize.dX *= 20;
         Stabilize.dY *= 20;
